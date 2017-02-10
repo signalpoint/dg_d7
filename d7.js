@@ -155,3 +155,71 @@ d7.entityViewController = function(entityId) {
   };
   return content;
 };
+
+/**
+ * BEGIN: Verbatim copy of jDrupal 7's field has/get helpers.
+ */
+
+/**
+ * Checks if an entity has at least one item for a given field name. Optionally pass in a
+ * language code and/or delta value, otherwise they default to 'und' and 0 respectively.
+ * @param {Object} entity
+ * @param {String} fieldName
+ * @param {String} language
+ * @param {Number} delta
+ * @returns {Boolean}
+ */
+d7.fieldHasItem = function(entity, fieldName, language, delta) {
+  if (!language) { language = language_default(); }
+  if (typeof delta === 'undefined') { delta = 0; }
+  return entity[fieldName] &&
+      entity[fieldName][language] &&
+      entity[fieldName][language].length &&
+      entity[fieldName][language][delta];
+};
+
+/**
+ * Gets an item from an entity given field name. Optionally pass in a language code and/or
+ * delta value, otherwise they default to 'und' and 0 respectively.
+ * @param {Object} entity
+ * @param {String} fieldName
+ * @param {String} language
+ * @param {Number} delta
+ * @returns {*}
+ */
+d7.fieldGetItem = function(entity, fieldName, language, delta) {
+  if (!language) { language = language_default(); }
+  if (typeof delta === 'undefined') { delta = 0; }
+  return entity[fieldName][language][delta];
+};
+
+/**
+ * Given an entity and field name, this will return how many items are on the field. Optionally
+ * pass in a language code otherwise it defaults to 'und'.
+ * @param {Object} entity
+ * @param {String} fieldName
+ * @param {String} language
+ * @returns {Number}
+ */
+d7.fieldGetItemCount = function(entity, fieldName, language) {
+  return !language ?
+      d7.fieldGetItems(entity, fieldName).length :
+      d7.fieldGetItems(entity, fieldName, language).length;
+};
+
+/**
+ * Gets items from an entity given a field name. Optionally pass in a language code otherwise
+ * it defaults to 'und'.
+ * @param {Object} entity
+ * @param {String} fieldName
+ * @param {String} language
+ * @returns {*}
+ */
+d7.fieldGetItems = function(entity, fieldName, language) {
+  if (!language) { language = language_default(); }
+  return entity[fieldName][language];
+};
+
+/**
+ * END
+ */
