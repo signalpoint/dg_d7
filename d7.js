@@ -221,5 +221,20 @@ d7.fieldGetItems = function(entity, fieldName, language) {
 };
 
 /**
+ * @see jDrupal.fieldSetItem().
+ */
+d7.fieldSetItem = function(entity, fieldName, propertyName, value, language, delta) {
+  if (!language) { language = language_default(); }
+  if (typeof delta === 'undefined') { delta = 0; }
+  if (!entity[fieldName]) { entity[fieldName] = {}; }
+  if (propertyName) {
+    if (!entity[fieldName][language]) { entity[fieldName][language] = []; }
+    if (!entity[fieldName][language][delta]) { entity[fieldName][language][delta] = {}; }
+    entity[fieldName][language][delta][propertyName] = value;
+  }
+  else { entity[fieldName][language][delta] = value; }
+};
+
+/**
  * END
  */
