@@ -44,6 +44,118 @@ d7.path = function() {
 };
 
 /**
+ * DRUPALGAP 7 HOOKS
+ */
+
+/**
+ * Implements hook_services_request_pre_postprocess_alter().
+ */
+function d7_services_request_pre_postprocess_alter(options, result) {
+  if (options.service == 'system' && options.resource == 'connect') {
+
+    // We borrow some code from jDrupal 8's resolve handler.
+    jDrupal.connected = true;
+
+    // Build a jDrupal 8 user object out of a jDrupal 7 user object.
+    var account = result.user;
+    if (!account.uid) { jDrupal.setCurrentUser(jDrupal.userDefaults()); }
+    else {
+      var accountObj = {
+        uid: [ { value: account.uid } ],
+        name: [ { value: account.name } ],
+        mail: [ { value: account.mail } ],
+        status: [ { value: account.status } ],
+        created: [ { value: account.created } ],
+        changed: [ { value: account.changed } ],
+        access: [ { value: account.access } ],
+        init: [ { value: account.init } ],
+        roles: []
+      };
+      for (var rid in account.roles) {
+        if (!account.roles.hasOwnProperty(rid)) { continue; }
+        accountObj.roles.push({
+          target_id: account.roles[rid],
+          target_type: 'user_role'
+        });
+      }
+      jDrupal.setCurrentUser(new jDrupal.User(accountObj));
+    }
+
+  }
+  else if (options.service == 'user' && options.resource == 'logout') {
+    jDrupal.setCurrentUser(jDrupal.userDefaults());
+  }
+}
+
+/**
+ * DRUPALGAP 8 HOOKS
+ */
+
+function d7_deviceready() {
+
+  // Set the path to Drupal 7.
+  d7.config('sitePath', jDrupal.config('sitePath'));
+
+  // Take over the start of the application.
+  return new Promise(function(ok, err) {
+
+    system_connect({
+      success: function(data) {
+
+        // Tell DrupalGap to continue and resolve.
+        dg.continue();
+        ok();
+      },
+      error: function(xhr, status, msg) {
+        console.log(arguments);
+        ok(msg);
+      }
+    });
+
+  });
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function d7_form_alter(form, form_state, form_id) {
+  return new Promise(function(ok, err) {
+
+    if (form_id == 'UserLoginForm') {
+
+      // Take over the login form's submit handler.
+      form._submit = ['d7.user_login_form_submit'];
+
+    }
+
+    ok();
+
+  });
+}
+
+d7.user_login_form_submit = function(form, formState) {
+  return new Promise(function(ok, err) {
+    //console.log(form_state);
+
+    // Let's login to Drupal...
+    user_login(formState.getValue('name'), formState.getValue('pass'), {
+      success: function(result) {
+        console.log(result);
+        ok();
+      },
+      error: function(xhr, status, msg) {
+        console.log(arguments);
+        document.getElementById('edit-pass').value = '';
+        dg.alert(JSON.parse(msg)[0]);
+        err();
+      }
+    });
+
+  });
+};
+
+
+/**
  * VIEWS
  */
 
