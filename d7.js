@@ -167,6 +167,10 @@ d7.user_login_form_submit = function(form, formState) {
 d7.Views = function(path) {
   this.path = path;
   this.results = null;
+  this._count = null;
+  this._page = null;
+  this._pages = null;
+  this._limit = null;
 };
 
 /**
@@ -185,6 +189,21 @@ d7.Views.prototype.getResults = function() {
   return this.results;
 };
 
+d7.Views.prototype.getCount = function() { return this._count; };
+d7.Views.prototype.setCount = function(count) { this._count = count; };
+
+d7.Views.prototype.getPage = function() { return this._page; };
+d7.Views.prototype.setPage = function(page) { this._page = page; };
+
+
+d7.Views.prototype.getPages = function() { return this._pages; };
+d7.Views.prototype.setPages = function(pages) { this._pages = pages; };
+
+d7.Views.prototype.getLimit = function() { return this._limit; };
+d7.Views.prototype.setLimit = function(limit) { this._limit = limit; };
+
+d7.Views.prototype.hasPages = function() { return !!this.getPages(); };
+
 /**
  * Retrieves the Views' results from the Drupal site's rest export.
  */
@@ -196,10 +215,18 @@ d7.Views.prototype.getView = function() {
       service: 'views',
       resource: null
     };
-    req.open('GET', d7.restPath() + self.getPath());
+    var viewUrl = d7.restPath() + self.getPath();
+    var page = self.getPage() !== null ? self.getPage() : dg._GET('page');
+    if (page) { viewUrl += (viewUrl.indexOf('?') == -1 ? '?' : '&') + 'page=' + page; }
+    req.open('GET', viewUrl);
     var loaded = function() {
       self.results = [];
       var results = JSON.parse(req.response);
+      var view = results.view;
+      self.setCount(view.count);
+      self.setPage(view.page);
+      self.setPages(view.pages);
+      self.setLimit(view.limit);
       if (results.view.count) {
         for (var i in results[results.view.root]) {
           if (!results[results.view.root].hasOwnProperty(i)) { continue; }
