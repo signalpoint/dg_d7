@@ -171,6 +171,7 @@ d7.Views = function(path) {
   this._page = null;
   this._pages = null;
   this._limit = null;
+  this._pagerReady = false;
 };
 
 /**
@@ -203,6 +204,10 @@ d7.Views.prototype.getLimit = function() { return this._limit; };
 d7.Views.prototype.setLimit = function(limit) { this._limit = limit; };
 
 d7.Views.prototype.hasPages = function() { return !!this.getPages(); };
+
+d7.Views.prototype.setPager = function(pager) { this._pager = pager; };
+d7.Views.prototype.getPager = function() { return this._pager; };
+d7.Views.prototype.pagerReady = function() { return !!this.getPager(); };
 
 /**
  * Retrieves the Views' results from the Drupal site's rest export.
