@@ -35,7 +35,7 @@ function dg_d7_form_alter(form, form_state, form_id) {
     if (form_id == 'UserLoginForm') {
 
       // Take over the login form's submit handler.
-      form._submit = ['d7.user_login_form_submit'];
+      form._submit = ['dg_d7.user_login_form_submit'];
 
     }
 
@@ -44,7 +44,7 @@ function dg_d7_form_alter(form, form_state, form_id) {
   });
 }
 
-d7.user_login_form_submit = function(form, formState) {
+dg_d7.user_login_form_submit = function(form, formState) {
   return new Promise(function(ok, err) {
     //console.log(form_state);
 
