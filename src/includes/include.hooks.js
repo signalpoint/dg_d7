@@ -16,10 +16,19 @@ function dg_d7_deviceready() {
         // Tell DrupalGap to continue and resolve.
         dg.continue();
         ok();
+
       },
       error: function(xhr, status, msg) {
         console.log(arguments);
-        ok(msg);
+
+        // If no one implemented deviceready_offline to handle this situation, just call dg.error() to handle it.
+        var hookName = 'deviceready_offline';
+        if (!jDrupal.moduleImplements(hookName)) {
+          ok();
+          setTimeout(function() { dg.error(xhr, status, msg); }, 1);
+        }
+        else { jDrupal.moduleInvokeAll(hookName, xhr, status, msg); }
+
       }
     });
 
