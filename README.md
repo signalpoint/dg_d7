@@ -12,32 +12,15 @@ To handle an offline scenario when the app first starts up, try something this:
  */
 function example_deviceready_offline(xhr, status, msg) {
 
+  // Do some stuff...
+
+  // Go to my custom offline page.
+  dg.goto('my/offline/page');
+
+  // Do some other stuff...
+
   // Tell dg8 to continue rendering the page.
   dg.continue();
-
-  // Give dg8 a chance to render the page, then show them a modal about the connection problem.
-  setTimeout(function() {
-    var modalContent = {};
-
-    modalContent.error = {
-      _theme: 'message',
-      _type: 'error',
-      _message: status + ' | ' + msg
-    };
-    modalContent.info = {
-      _markup: '<p>' + dg.t('Please check your Internet connection.') + '</p>'
-    };
-    modalContent.try_again = {
-      _markup: dg.b(dg.t('Try again'), {
-        _attributes: {
-          class: ['btn-cw'],
-          onclick: "dg.reload()"
-        }
-      })
-    };
-
-    dg.modal(modalContent, { id: 'modal-offline', title: dg.t('Network Issue') });
-  }, 1);
 
 }
 ```
