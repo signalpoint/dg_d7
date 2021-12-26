@@ -55,3 +55,10 @@ example.pageArticle = function(node) {
   
 };
 ```
+
+Later, we can use `dg_d7.getMenuObject()` elsewhere in our code to get the entity:
+
+```
+var node = dg_d7.getMenuObject();
+console.log(node.title);
+```

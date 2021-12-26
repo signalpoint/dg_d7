@@ -38,6 +38,17 @@ function dg_d7_deviceready() {
 }
 
 /**
+ * Implements hook_pre_process_route_change
+ */
+function dg_d7_pre_process_route_change(newPath, oldPath) {
+
+  // Clear any menu object entity info.
+  d7.clearMenuObjectType();
+  d7.clearMenuObject();
+
+}
+
+/**
  * Implements hook_form_alter().
  */
 function dg_d7_form_alter(form, form_state, form_id) {

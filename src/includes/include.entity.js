@@ -1,3 +1,25 @@
+d7._menuObjectType = null; // Holds the entity type used by the view controller.
+d7._menuObject = null; // Holds the entity loaded by the view controller.
+
+d7.getMenuObjectType = function() {
+  return d7._menuObjectType;
+};
+d7.getMenuObject = function() {
+  return d7._menuObject;
+};
+d7.setMenuObjectType = function(entityType) {
+  d7._menuObjectType = entityType;
+};
+d7.setMenuObject = function(entity) {
+  d7._menuObject = entity;
+};
+d7.clearMenuObjectType = function() {
+  d7._menuObjectType = null;
+};
+d7.clearMenuObject = function() {
+  d7._menuObject = null;
+};
+
 d7.entityViewController = function(entityId) {
   var content = {};
   content.entity = {
@@ -5,8 +27,11 @@ d7.entityViewController = function(entityId) {
     _grab: function() {
       return new Promise(function (fill, dump) {
         var route = dg.router.getActiveRoute();
-        entity_load(route.defaults._dgEntityType, entityId, {
+        var entityType = route.defaults._dgEntityType;
+        entity_load(entityType, entityId, {
           success: function(entity) {
+            d7.setMenuObjectType(entityType);
+            d7.setMenuObject(entity);
             fill(route.defaults._dgController(entity));
           },
           error: function(xhr, status, msg) {
