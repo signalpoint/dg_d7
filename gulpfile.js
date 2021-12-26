@@ -1,25 +1,37 @@
+var makeBinary = true;
+
 var gulp = require('gulp'),
     watch = require('gulp-watch'),
     gp_concat = require('gulp-concat'),
     gp_rename = require('gulp-rename'),
-    gp_uglify = require('gulp-uglify');
+    gp_uglify = require('gulp-uglify'),
+    gp_minify_css = require('gulp-minify-css');
 
-var dgd7ModuleSrc = [
-  './src/*.js',
+var jsSrc = [
+  './src/_dg_d7.js',
   './src/includes/include.*.js'
 ];
 
-// Task to build the dg_d7.min.js file.
-gulp.task('minifyJS', function(){
-  return gulp.src(dgd7ModuleSrc)
-      .pipe(gp_concat('concat.js'))
-      .pipe(gulp.dest(''))
-      .pipe(gp_rename('dg_d7.min.js'))
-      .pipe(gp_uglify())
-      .pipe(gulp.dest(''));
-});
+// Minify JavaScript
+function minifyJs() {
+  console.log('compressing dg_d7.js...');
+  var js = gulp.src(jsSrc)
+    .pipe(gp_concat('dg_d7.js'))
+    .pipe(gulp.dest('./'));
+  if (makeBinary) {
+    console.log('compressing dg_d7.min.js...');
+    return js.pipe(gp_rename('dg_d7.min.js'))
+    .pipe(gp_uglify())
+    .pipe(gulp.dest('./'));
+  }
+  return js;
+}
+gulp.task(minifyJs);
 
-gulp.task('default', function () {
-  watch(dgd7ModuleSrc, function(event) { gulp.start('minifyJS') });
-  gulp.start('minifyJS');
+gulp.task('default', function(done) {
+
+  gulp.watch(jsSrc, gulp.series('minifyJs'));
+
+  done();
+
 });
