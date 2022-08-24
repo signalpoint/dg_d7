@@ -21,27 +21,39 @@ d7.clearMenuObject = function() {
 };
 
 d7.entityViewController = function(entityId) {
-  var content = {};
-  content.entity = {
-    _theme: 'bucket',
-    _grab: function() {
-      return new Promise(function (fill, dump) {
-        var route = dg.router.getActiveRoute();
-        var entityType = route.defaults._dgEntityType;
+
+  var route = dg.router.load(dg.getPath());
+  var entityType = route.defaults._dgEntityType;
+  var attrPrefix = entityType.replaceAll('_', '-');
+  var id = attrPrefix + '-' + entityId;
+
+  return {
+
+    entity: {
+      _theme: 'bucket',
+      _attributes: {
+        id: id,
+        class: [attrPrefix]
+      },
+      _fill: function(ok) {
         entity_load(entityType, entityId, {
           success: function(entity) {
             d7.setMenuObjectType(entityType);
             d7.setMenuObject(entity);
-            fill(route.defaults._dgController(entity));
+            if (entityType === 'node') {
+              dg.qs('#' + id).classList.add(attrPrefix + '-' + entity.type.replaceAll('_', '-'));
+            }
+            ok(route.defaults._dgController(entity));
           },
           error: function(xhr, status, msg) {
-            fill(route.defaults._dgController(null, xhr, status, msg));
+            ok(route.defaults._dgController(null, xhr, status, msg));
           }
         });
-      });
+      }
     }
+
   };
-  return content;
+
 };
 
 /**
