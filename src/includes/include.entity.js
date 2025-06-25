@@ -36,19 +36,35 @@ d7.entityViewController = function(entityId) {
         class: [attrPrefix]
       },
       _fill: function(ok) {
-        entity_load(entityType, entityId, {
-          success: function(entity) {
-            d7.setMenuObjectType(entityType);
-            d7.setMenuObject(entity);
-            if (entityType === 'node') {
-              dg.qs('#' + id).classList.add(attrPrefix + '-' + entity.type.replaceAll('_', '-'));
-            }
-            ok(route.defaults._dgController(entity));
-          },
-          error: function(xhr, status, msg) {
-            ok(route.defaults._dgController(null, xhr, status, msg));
+
+        var currentType = d7.getMenuObjectType();
+        var currentObject = d7.getMenuObject();
+        var primaryKey = entity_primary_key(entityType);
+        var alreadyLoaded = currentType == entityType && currentObject[primaryKey] == entityId;
+
+        // Prepare what to do when we're done and have a fully loaded entity.
+        var done = function(entityType, entity) {
+          if (entityType === 'node') {
+            dg.qsi(id).classList.add(attrPrefix + '-' + entity.type.replaceAll('_', '-'));
           }
-        });
+          ok(route.defaults._dgController(entity));
+        };
+
+        // If the entity is already loaded, use it. Otherwise call the server for a fresh copy.
+        if (alreadyLoaded) { done(entityType, currentObject); }
+        else {
+          entity_load(entityType, entityId, {
+            success: function(entity) {
+              d7.setMenuObjectType(entityType);
+              d7.setMenuObject(entity);
+              done(entityType, entity);
+            },
+            error: function(xhr, status, msg) {
+              ok(route.defaults._dgController(null, xhr, status, msg));
+            }
+          });
+        }
+
       }
     }
 
