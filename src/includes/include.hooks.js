@@ -42,9 +42,22 @@ function dg_d7_deviceready() {
  */
 function dg_d7_pre_process_route_change(newPath, oldPath) {
 
-  // Clear any menu object entity info.
-  d7.clearMenuObjectType();
-  d7.clearMenuObject();
+  if (newPath && oldPath) {
+
+    var oldRoute = dg.router.load(oldPath);
+    var newRoute = dg.router.load(newPath);
+
+    // If we're staying on the same base route and are keeping the same entity id, bail out.
+    // Otherwise clear any menu object entity info.
+    var hasSameBaseRoute = oldRoute.defaults._base_route == newRoute.defaults._base_route;
+    if (hasSameBaseRoute) {
+      var hasSameEntityId = dg.arg(1, oldPath) == dg.arg(1, newPath);
+      if (hasSameEntityId) { return; }
+    }
+    d7.clearMenuObjectType();
+    d7.clearMenuObject();
+
+  }
 
 }
 
